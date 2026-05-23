@@ -12,11 +12,12 @@ export default function Login() {
 
   async function handleLogin() {
     setError("");
-    const res = await fetch("http://localhost/backend/login.php", {
+    const res = await fetch("https://wordle-app.xo.je/backend/login.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     });
+
 
     const data = await res.json();
 
