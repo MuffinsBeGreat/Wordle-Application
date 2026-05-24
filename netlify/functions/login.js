@@ -46,9 +46,13 @@ export async function handler(event) {
 
     return {
       statusCode: 200,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ status: "success", token })
+      body: JSON.stringify({
+        status: "success",
+        token,
+        user: { username }
+      })
     };
+
   } catch (err) {
     return {
       statusCode: 500,
