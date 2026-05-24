@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export async function handler(event, context) {
-  // CORS
+export async function handler(event) {
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
@@ -16,10 +15,7 @@ export async function handler(event, context) {
   const auth = event.headers.authorization || "";
 
   if (!auth.startsWith("Bearer ")) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ valid: false })
-    };
+    return { statusCode: 401, body: JSON.stringify({ valid: false }) };
   }
 
   const token = auth.substring(7);
@@ -30,15 +26,9 @@ export async function handler(event, context) {
     return {
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({
-        valid: true,
-        user: decoded
-      })
+      body: JSON.stringify({ valid: true, user: decoded })
     };
-  } catch (err) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ valid: false })
-    };
+  } catch {
+    return { statusCode: 401, body: JSON.stringify({ valid: false }) };
   }
 }

@@ -1,13 +1,13 @@
-import mysql from "mysql2/promise";
+import { db } from "./db.js";
+import jwt from "jsonwebtoken";
 
-export async function handler(event, context) {
-  // Allow CORS
+export async function handler(event) {
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Allow-Methods": "POST, OPTIONS"
       }
     };
@@ -23,24 +23,21 @@ export async function handler(event, context) {
   }
 
   try {
-    const conn = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME
-    });
-
     const hash = await Bun.password.hash(password);
 
-    await conn.execute(
-      "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+    await db.query(
+      "INSERT INTO users (username, password_hash) VALUES ($1, $2)",
       [username, hash]
     );
+
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+      expiresIn: "7d"
+    });
 
     return {
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ status: "success" })
+      body: JSON.stringify({ status: "success", token })
     };
   } catch (err) {
     return {

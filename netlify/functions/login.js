@@ -1,8 +1,7 @@
+import { db } from "./db.js";
 import jwt from "jsonwebtoken";
-import { getDB } from "./db.js";
 
-export async function handler(event, context) {
-  // CORS
+export async function handler(event) {
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
@@ -16,21 +15,13 @@ export async function handler(event, context) {
 
   const { username, password } = JSON.parse(event.body || "{}");
 
-  if (!username || !password) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ status: "error", message: "Missing fields" })
-    };
-  }
-
   try {
-    const db = await getDB();
-    const [rows] = await db.execute(
-      "SELECT * FROM users WHERE username = ?",
+    const result = await db.query(
+      "SELECT * FROM users WHERE username = $1",
       [username]
     );
 
-    const user = rows[0];
+    const user = result.rows[0];
 
     if (!user) {
       return {
@@ -48,27 +39,14 @@ export async function handler(event, context) {
       };
     }
 
-    // Create JWT
-    const token = jwt.sign(
-      {
-        id: user.id,
-        username: user.username
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+      expiresIn: "7d"
+    });
 
     return {
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({
-        status: "success",
-        token,
-        user: {
-          id: user.id,
-          username: user.username
-        }
-      })
+      body: JSON.stringify({ status: "success", token })
     };
   } catch (err) {
     return {
