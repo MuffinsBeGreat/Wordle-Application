@@ -12,11 +12,12 @@ export default function Login() {
 
   async function handleLogin() {
     setError("");
-    const res = await fetch("https://wordle-app.mygamesonline.org/login.php", {
+    const res = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password })
     });
+
 
 
     const data = await res.json();

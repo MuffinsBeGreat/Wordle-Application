@@ -18,11 +18,12 @@ export default function Register() {
       return;
     }
 
-    const res = await fetch("https://wordle-app.mygamesonline.org/register.php", {
+    const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password })
     });
+
 
 
     const data = await res.json();
