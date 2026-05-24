@@ -12,7 +12,7 @@ export default function Login() {
 
   async function handleLogin() {
     setError("");
-    const res = await fetch("https://wordle-app.xo.je/backend/login.php", {
+    const res = await fetch("https://wordle-app.mygamesonline.org/login.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
