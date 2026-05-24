@@ -1,5 +1,6 @@
 import { db } from "./db.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 export async function handler(event) {
     if (event.httpMethod === "OPTIONS") {
@@ -23,7 +24,7 @@ export async function handler(event) {
     }
 
     try {
-        const hash = await Bun.password.hash(password);
+        const hash = await bcrypt.hash(password, 10);
 
         await db.query(
             "INSERT INTO users (username, password_hash) VALUES ($1, $2)",

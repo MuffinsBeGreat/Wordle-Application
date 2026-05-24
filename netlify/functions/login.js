@@ -1,5 +1,6 @@
 import { db } from "./db.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs"
 
 export async function handler(event) {
   if (event.httpMethod === "OPTIONS") {
@@ -30,7 +31,7 @@ export async function handler(event) {
       };
     }
 
-    const valid = await Bun.password.verify(password, user.password_hash);
+    const valid = await bcrypt.compare(password, user.password_hash);
 
     if (!valid) {
       return {
