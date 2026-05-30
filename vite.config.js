@@ -10,4 +10,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost",
+        changeOrigin: true,
+        rewrite: (path) =>
+          path.replace(/^\/api\/(.*)$/, "/wordle-api/$1.php")
+      },
+    },
+  },
 });

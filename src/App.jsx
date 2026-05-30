@@ -9,6 +9,7 @@ import Wordle4 from "@/routes/wordle-4";
 import Wordle5 from "@/routes/wordle-5";
 import Wordle6 from "@/routes/wordle-6";
 import Wordle7 from "@/routes/wordle-7";
+import Search from "@/routes/search";
 
 export default function App() {
   return (
@@ -23,6 +24,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <Search />
           </ProtectedRoute>
         }
       />

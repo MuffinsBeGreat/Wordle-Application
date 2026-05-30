@@ -18,8 +18,6 @@ export default function Login() {
       body: JSON.stringify({ username, password })
     });
 
-
-
     const data = await res.json();
 
     if (data.status === "success") {
