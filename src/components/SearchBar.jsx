@@ -19,7 +19,7 @@ export default function SearchBar({ onSelect }) {
     clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
-      fetch(`http://localhost/wordle-api/search?q=${input}`)
+      fetch(`/api/search?q=${input}`)
         .then((res) => res.json())
         .then((data) => {
           setSuggestions(data);
