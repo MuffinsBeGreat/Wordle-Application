@@ -4,6 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+function isValidPassword(password) {
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(password);
+}
+
 export default function Register() {
   const nav = useNavigate();
   const [username, setUsername] = useState("");
@@ -13,8 +17,16 @@ export default function Register() {
 
   async function handleRegister() {
     setError("");
+
     if (password !== confirm) {
       setError("Passwords do not match");
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      setError(
+        "Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character."
+      );
       return;
     }
 
@@ -49,6 +61,17 @@ export default function Register() {
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
+        <p className="text-xs text-muted-foreground">
+          Password must be at least 8 characters and include:
+          <br />
+          • Uppercase letter
+          <br />
+          • Lowercase letter
+          <br />
+          • Number
+          <br />
+          • Special character
+        </p>
         <Input
           placeholder="Confirm Password"
           type="password"

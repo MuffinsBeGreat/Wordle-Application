@@ -19,7 +19,30 @@ export async function handler(event) {
     if (!username || !password) {
         return {
             statusCode: 400,
-            body: JSON.stringify({ status: "error", message: "Missing fields" })
+            headers: {
+                "Access-Control-Allow-Origin": "*"
+            },
+            body: JSON.stringify({
+                status: "error",
+                message: "Missing fields"
+            })
+        };
+    }
+
+    const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*"
+            },
+            body: JSON.stringify({
+                status: "error",
+                message:
+                    "Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character."
+            })
         };
     }
 
@@ -45,6 +68,9 @@ export async function handler(event) {
 
         return {
             statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*"
+            },
             body: JSON.stringify({
                 status: "error",
                 message: err.message
