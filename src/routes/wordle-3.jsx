@@ -62,6 +62,7 @@ export default function Wordle6() {
   }
 
   const items = [
+    { label: "Home", href: "/dashboard" },
     { label: "Search", href: "/search" },
     { label: "Logout", href: "/", onClick: handleLogout }
   ];
@@ -98,7 +99,7 @@ export default function Wordle6() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-xl mx-auto">
       <GooeyNav
         items={items}
         particleCount={15}
