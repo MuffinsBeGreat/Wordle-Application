@@ -4,31 +4,19 @@ export async function handler(event) {
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
-      }
+      headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Authorization, Content-Type" }
     };
   }
 
-  const auth = event.headers.authorization || "";
+  const auth = event.headers["authorization"] ?? "";
+  const token = auth.replace("Bearer ", "");
 
-  if (!auth.startsWith("Bearer ")) {
-    return { statusCode: 401, body: JSON.stringify({ valid: false }) };
-  }
-
-  const token = auth.substring(7);
+  if (!token) return { statusCode: 401, body: JSON.stringify({ error: "No token" }) };
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    return {
-      statusCode: 200,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ valid: true, user: decoded })
-    };
+    jwt.verify(token, process.env.JWT_SECRET);
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   } catch {
-    return { statusCode: 401, body: JSON.stringify({ valid: false }) };
+    return { statusCode: 401, body: JSON.stringify({ error: "Invalid token" }) };
   }
 }
