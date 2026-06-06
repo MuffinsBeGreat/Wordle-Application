@@ -2,31 +2,10 @@
   functions = "netlify/functions"
   command = "npm run build"
 
+# Specific API routes first
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/api/words"
-  to = "/.netlify/functions/words-create"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/words/:word"
-  to = "/.netlify/functions/words-update"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/admin/users"
-  to = "/.netlify/functions/admin-users"
+  from = "/api/auth/verify"
+  to = "/.netlify/functions/verify"
   status = 200
   force = true
 
@@ -43,7 +22,31 @@
   force = true
 
 [[redirects]]
-  from = "/api/auth/verify"
-  to = "/.netlify/functions/verify"
+  from = "/api/admin/users"
+  to = "/.netlify/functions/admin-users"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/api/words/:word"
+  to = "/.netlify/functions/words-update"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/words"
+  to = "/.netlify/functions/words-create"
+  status = 200
+  force = true
+
+# Wildcard fallback for any other /api/* routes 
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
