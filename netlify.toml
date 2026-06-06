@@ -41,3 +41,9 @@
   to = "/.netlify/functions/admin-users-delete"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/api/auth/verify"
+  to = "/.netlify/functions/verify"
+  status = 200
+  force = true
