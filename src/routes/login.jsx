@@ -23,6 +23,7 @@ export default function Login() {
     if (data.status === "success") {
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.user.username);
+      localStorage.setItem("role", data.user.role);
       nav("/dashboard");
     } else {
       setError(data.message || "Login failed");

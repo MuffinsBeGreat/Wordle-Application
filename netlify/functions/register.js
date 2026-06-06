@@ -54,14 +54,18 @@ export async function handler(event) {
             [username, hash, 2]
         );
 
-        const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ username, role: 2 }, process.env.JWT_SECRET, {
             expiresIn: "7d"
         });
 
         return {
             statusCode: 200,
             headers: { "Access-Control-Allow-Origin": "*" },
-            body: JSON.stringify({ status: "success", token })
+            body: JSON.stringify({
+                status: "success",
+                token,
+                user: { username, role: 2 }
+            })
         };
     } catch (err) {
         console.error("REGISTER ERROR:", err);

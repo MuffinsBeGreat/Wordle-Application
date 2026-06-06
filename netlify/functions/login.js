@@ -40,9 +40,11 @@ export async function handler(event) {
       };
     }
 
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-      expiresIn: "7d"
-    });
+    const token = jwt.sign(
+      { user_id: user.user_id, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     return {
       statusCode: 200,

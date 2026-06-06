@@ -5,19 +5,25 @@ function cleanJoin(base, endpoint) {
 }
 
 export async function apiFetch(endpoint, options = {}) {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(cleanJoin(API_BASE, endpoint), {
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
     ...options,
   });
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || "API request failed");
+  // If any request comes back 401, token has expired — log out
+  if (res.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+    return;
   }
 
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "API request failed");
   return data;
 }

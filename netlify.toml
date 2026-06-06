@@ -1,13 +1,34 @@
-[build]
-  functions = "netlify/functions"
-  command = "npm run build"
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[redirects]]
+  from = "/api/words"
+  to = "/.netlify/functions/words-create"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/words/:word"
+  to = "/.netlify/functions/words-update"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/users"
+  to = "/.netlify/functions/admin-users"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/users/:id/role"
+  to = "/.netlify/functions/admin-users-role"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/users/:id"
+  to = "/.netlify/functions/admin-users-delete"
+  status = 200
+  force = true
