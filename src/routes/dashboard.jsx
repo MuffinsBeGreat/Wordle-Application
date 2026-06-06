@@ -1,13 +1,24 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import GooeyNav from "@/components/GooeyNav";
 
 export default function Dashboard() {
+  const nav = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    nav("/");
+  }
+
   const items = [
     { label: "Search", href: "/search" },
-    { label: "Logout", href: "/" }
+    { label: "Logout", href: "/", onClick: handleLogout }
   ];
+  
   return (
     <div className="p-6 max-w-xl mx-auto">
       <GooeyNav

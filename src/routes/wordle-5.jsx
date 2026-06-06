@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import WordleInput from "@/components/WordleInput";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import GooeyNav from "@/components/GooeyNav";
 
 const SECRET = "PHASE";
 const WORD_LENGTH = 5;
@@ -9,6 +11,20 @@ const MAX_GUESSES = WORD_LENGTH + 1;
 function scoreGuess(guess, secret) {
   const result = Array(secret.length).fill("absent");
   const used = Array(secret.length).fill(false);
+
+  const nav = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    nav("/");
+  }
+
+  const items = [
+    { label: "Search", href: "/search" },
+    { label: "Logout", href: "/", onClick: handleLogout }
+  ];
 
   // First pass: correct letters in correct position
   for (let i = 0; i < secret.length; i++) {
@@ -83,6 +99,16 @@ export default function Wordle6() {
 
   return (
     <div className="p-6">
+      <GooeyNav
+        items={items}
+        particleCount={15}
+        particleDistances={[90, 10]}
+        particleR={100}
+        initialActiveIndex={0}
+        animationTime={600}
+        timeVariance={300}
+        colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+      />
       <Card className="max-w-xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-2">5-Letter Wordle</h1>
 

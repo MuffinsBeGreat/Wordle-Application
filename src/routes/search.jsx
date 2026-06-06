@@ -1,5 +1,6 @@
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
+import { useNavigate } from "react-router-dom";
 import GooeyNav from "@/components/GooeyNav";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,9 +21,18 @@ export default function Search() {
     const [usersOpen, setUsersOpen] = useState(false);
     const [feedback, setFeedback] = useState("");
 
+    const nav = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        localStorage.removeItem("role");
+        nav("/");
+    }
+
     const items = [
-        { label: "Home", href: "/dashboard" },
-        { label: "Logout", href: "/" },
+        { label: "Search", href: "/search" },
+        { label: "Logout", href: "/", onClick: handleLogout }
     ];
 
     // Word actions 
