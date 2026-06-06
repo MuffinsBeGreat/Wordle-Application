@@ -12,20 +12,6 @@ function scoreGuess(guess, secret) {
   const result = Array(secret.length).fill("absent");
   const used = Array(secret.length).fill(false);
 
-  const nav = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("role");
-    nav("/");
-  }
-
-  const items = [
-    { label: "Search", href: "/search" },
-    { label: "Logout", href: "/", onClick: handleLogout }
-  ];
-
   // First pass: correct letters in correct position
   for (let i = 0; i < secret.length; i++) {
     if (guess[i] === secret[i]) {
@@ -65,6 +51,20 @@ export default function Wordle6() {
   const [gameOver, setGameOver] = useState(false);
   const [invalidWord, setInvalidWord] = useState(false);
   const [checking, setChecking] = useState(false);
+
+  const nav = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    nav("/");
+  }
+
+  const items = [
+    { label: "Search", href: "/search" },
+    { label: "Logout", href: "/", onClick: handleLogout }
+  ];
 
   const activeRow = guesses.length;
   const won = guesses.some(g => g.states.every(s => s === "correct"));
