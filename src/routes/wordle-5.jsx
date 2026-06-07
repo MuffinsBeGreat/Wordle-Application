@@ -1,18 +1,16 @@
 import { Card } from "@/components/ui/card";
 import WordleInput from "@/components/WordleInput";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import GooeyNav from "@/components/GooeyNav";
 
-const SECRET = "PHASE";
-const WORD_LENGTH = 5;
+const WORD_LENGTH = 5; // 3, 4, 5, 6, or 7
 const MAX_GUESSES = WORD_LENGTH + 1;
 
 function scoreGuess(guess, secret) {
   const result = Array(secret.length).fill("absent");
   const used = Array(secret.length).fill(false);
 
-  // First pass: correct letters in correct position
   for (let i = 0; i < secret.length; i++) {
     if (guess[i] === secret[i]) {
       result[i] = "correct";
@@ -20,7 +18,6 @@ function scoreGuess(guess, secret) {
     }
   }
 
-  // Second pass: present letters
   for (let i = 0; i < guess.length; i++) {
     if (result[i] === "correct") continue;
     for (let j = 0; j < secret.length; j++) {
@@ -38,13 +35,16 @@ function scoreGuess(guess, secret) {
 const validateWord = async (word) => {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
-    return res.ok; // 200 = real word, 404 = not found
+    return res.ok;
   } catch {
-    return true; // If API fails, optimistically allow the guess
+    return true;
   }
 };
 
-export default function Wordle6() {
+export default function Wordle5() { // rename to Wordle3, Wordle4, etc.
+  const [secret, setSecret] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [guesses, setGuesses] = useState([]);
   const [current, setCurrent] = useState(Array(WORD_LENGTH).fill(""));
   const [shake, setShake] = useState(false);
@@ -54,24 +54,43 @@ export default function Wordle6() {
 
   const nav = useNavigate();
 
+  const loadWord = () => {
+    setLoading(true);
+    setError(null);
+    fetch(`/api/words/random?length=${WORD_LENGTH}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.word) {
+          setSecret(data.word);
+        } else {
+          setError("Could not load a word. Please try again.");
+        }
+      })
+      .catch(() => setError("Could not load a word. Please try again."))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadWord();
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     localStorage.removeItem("role");
     nav("/");
-  }
+  };
 
   const items = [
     { label: "Home", href: "/dashboard" },
     { label: "Search", href: "/search" },
-    { label: "Logout", href: "/", onClick: handleLogout }
+    { label: "Logout", href: "/", onClick: handleLogout },
   ];
 
-  const activeRow = guesses.length;
-  const won = guesses.some(g => g.states.every(s => s === "correct"));
+  const won = guesses.some((g) => g.states.every((s) => s === "correct"));
 
   const handleSubmit = async (word) => {
-    if (gameOver || checking) return;
+    if (gameOver || checking || !secret) return;
     setChecking(true);
 
     const isReal = await validateWord(word);
@@ -84,18 +103,27 @@ export default function Wordle6() {
       return;
     }
 
-    const states = scoreGuess(word, SECRET);
+    const states = scoreGuess(word, secret);
     const newGuesses = [...guesses, { letters: [...current], states }];
     setGuesses(newGuesses);
     setCurrent(Array(WORD_LENGTH).fill(""));
 
-    const justWon = states.every(s => s === "correct");
+    const justWon = states.every((s) => s === "correct");
     if (justWon || newGuesses.length >= MAX_GUESSES) setGameOver(true);
   };
 
   const handleInvalid = () => {
     setShake(true);
     setTimeout(() => setShake(false), 600);
+  };
+
+  const handleNewGame = () => {
+    setGuesses([]);
+    setCurrent(Array(WORD_LENGTH).fill(""));
+    setGameOver(false);
+    setShake(false);
+    setInvalidWord(false);
+    loadWord();
   };
 
   return (
@@ -112,56 +140,71 @@ export default function Wordle6() {
       />
       <br />
       <Card className="max-w-xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-2">5-Letter Wordle</h1>
+        <h1 className="text-2xl font-bold mb-2">X-Letter Wordle</h1>
 
-        <div className="flex flex-col items-center gap-2">
-          {/* Submitted guesses */}
-          {guesses.map((g, i) => (
-            <WordleInput
-              key={i}
-              wordLength={WORD_LENGTH}
-              value={g.letters}
-              tileStates={g.states}
-              disabled
-            />
-          ))}
+        {loading && (
+          <p className="text-center text-muted-foreground py-8">Loading word...</p>
+        )}
 
-          {/* Active row */}
-          {!gameOver && (
-            <>
+        {error && (
+          <p className="text-center text-red-500 py-8">{error}</p>
+        )}
+
+        {!loading && !error && (
+          <div className="flex flex-col items-center gap-2">
+            {guesses.map((g, i) => (
               <WordleInput
-                key={`active-${guesses.length}`}
+                key={i}
                 wordLength={WORD_LENGTH}
-                value={current}
-                onChange={setCurrent}
-                onSubmit={handleSubmit}
-                shake={shake}
-                autoFocus
-              />
-              {invalidWord && (
-                <p className="text-sm text-red-500 font-medium">Not a valid word!</p>
-              )}
-            </>
-          )}
-
-          {/* Empty rows */}
-          {!gameOver && Array.from(
-            { length: MAX_GUESSES - guesses.length - 1 },
-            (_, i) => (
-              <WordleInput
-                key={`empty-${i}`}
-                wordLength={WORD_LENGTH}
-                value={Array(WORD_LENGTH).fill("")}
+                value={g.letters}
+                tileStates={g.states}
                 disabled
               />
-            )
-          )}
-        </div>
+            ))}
+
+            {!gameOver && (
+              <>
+                <WordleInput
+                  key={`active-${guesses.length}`}
+                  wordLength={WORD_LENGTH}
+                  value={current}
+                  onChange={setCurrent}
+                  onSubmit={handleSubmit}
+                  shake={shake}
+                  autoFocus
+                />
+                {invalidWord && (
+                  <p className="text-sm text-red-500 font-medium">Not a valid word!</p>
+                )}
+              </>
+            )}
+
+            {!gameOver && Array.from(
+              { length: MAX_GUESSES - guesses.length - 1 },
+              (_, i) => (
+                <WordleInput
+                  key={`empty-${i}`}
+                  wordLength={WORD_LENGTH}
+                  value={Array(WORD_LENGTH).fill("")}
+                  disabled
+                />
+              )
+            )}
+          </div>
+        )}
 
         {gameOver && (
-          <p className="text-center mt-6 font-semibold">
-            {won ? "You got it!" : `The word was ${SECRET}`}
-          </p>
+          <div className="text-center mt-6 space-y-3">
+            <p className="font-semibold">
+              {won ? "You got it!" : `The word was ${secret}`}
+            </p>
+            <button
+              onClick={handleNewGame}
+              className="px-4 py-2 rounded bg-primary text-primary-foreground hover:opacity-90 transition"
+            >
+              Play Again
+            </button>
+          </div>
         )}
       </Card>
     </div>

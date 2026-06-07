@@ -37,6 +37,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/words/random"
+  to = "/.netlify/functions/words-random"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/words/:word"
   to = "/.netlify/functions/words-update"
   status = 200
