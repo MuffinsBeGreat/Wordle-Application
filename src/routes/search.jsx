@@ -31,6 +31,7 @@ export default function Search() {
     }
 
     const items = [
+        { label: "Home", href: "/dashboard" },
         { label: "Search", href: "/search" },
         { label: "Logout", href: "/", onClick: handleLogout }
     ];
@@ -116,16 +117,22 @@ export default function Search() {
                 colors={[1, 2, 3, 1, 2, 3, 1, 4]}
             />
 
-            <div className="flex items-center justify-between mb-4">
-                <h1 className="text-3xl font-bold">Search</h1>
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold mb-3">Search Words</h1>
                 {isAdmin && (
-                    <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setAddMode(m => !m)}>
+                    <div className="flex gap-2 border-t border-border pt-3">
+                        <Button
+                            variant={addMode ? "default" : "outline"}
+                            onClick={() => setAddMode(m => !m)}
+                        >
                             + Add Word
                         </Button>
-                        <Button variant="outline" onClick={loadUsers}>
+                        {/* <Button
+                            variant={usersOpen ? "default" : "outline"}
+                            onClick={loadUsers}
+                        >
                             Manage Users
-                        </Button>
+                        </Button> */}
                     </div>
                 )}
             </div>
@@ -156,34 +163,35 @@ export default function Search() {
                 </Card>
             )}
 
-            <SearchBar onSelect={data => { setSelectedData(data); setEditing(false); }} />
+            <div className="w-full max-w-[350px] mx-auto">
+                <SearchBar onSelect={data => { setSelectedData(data); setEditing(false); }} />
 
-            {/* Selected word result */}
-            {selectedData && (
-                <Card className="mt-6 p-4 space-y-2">
-                    {editing ? (
-                        <>
-                            <Input value={editWord} onChange={e => setEditWord(e.target.value)} maxLength={7} />
-                            <Input value={editDesc} onChange={e => setEditDesc(e.target.value)} />
-                            <div className="flex gap-2">
-                                <Button onClick={saveEdit}>Save</Button>
-                                <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <p className="font-bold text-lg">{selectedData.word}</p>
-                            <p className="text-muted-foreground">{selectedData.description}</p>
-                            {isAdmin && (
-                                <div className="flex gap-2 pt-2">
-                                    <Button variant="outline" onClick={startEdit}>Edit</Button>
-                                    <Button variant="destructive" onClick={deleteWord}>Delete</Button>
+                {selectedData && (
+                    <Card className="mt-6 p-4 space-y-2 relative z-0">
+                        {editing ? (
+                            <>
+                                <Input value={editWord} onChange={e => setEditWord(e.target.value)} maxLength={7} />
+                                <Input value={editDesc} onChange={e => setEditDesc(e.target.value)} />
+                                <div className="flex gap-2">
+                                    <Button onClick={saveEdit}>Save</Button>
+                                    <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
                                 </div>
-                            )}
-                        </>
-                    )}
-                </Card>
-            )}
+                            </>
+                        ) : (
+                            <>
+                                <p className="font-bold text-lg">{selectedData.word}</p>
+                                <p className="text-muted-foreground">{selectedData.description}</p>
+                                {isAdmin && (
+                                    <div className="flex gap-2 pt-2">
+                                        <Button variant="outline" onClick={startEdit}>Edit</Button>
+                                        <Button variant="destructive" onClick={deleteWord}>Delete</Button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </Card>
+                )}
+            </div>
 
             {/* User management panel */}
             {isAdmin && usersOpen && (

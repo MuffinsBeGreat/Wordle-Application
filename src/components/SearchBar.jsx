@@ -8,6 +8,7 @@ export default function SearchBar({ onSelect }) {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const timeoutRef = useRef(null);
+  const justSelectedRef = useRef(false); // add this
 
   useEffect(() => {
     if (!input) {
@@ -15,9 +16,12 @@ export default function SearchBar({ onSelect }) {
       return;
     }
 
-    // debounce so we don’t spam PHP
-    clearTimeout(timeoutRef.current);
+    if (justSelectedRef.current) {
+      justSelectedRef.current = false; // reset and skip the fetch
+      return;
+    }
 
+    clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       fetch(`/api/search?q=${input}`)
         .then((res) => res.json())
@@ -32,6 +36,7 @@ export default function SearchBar({ onSelect }) {
   }, [input]);
 
   const handleSelect = (item) => {
+    justSelectedRef.current = true; // set flag before changing input
     setInput(item.word);
     setShowDropdown(false);
     setSuggestions([]);
@@ -48,9 +53,8 @@ export default function SearchBar({ onSelect }) {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="Search words..."
-        onFocus={() => setShowDropdown(true)}
+        onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
       />
-
       {showDropdown && suggestions.length > 0 && (
         <ul className="dropdown">
           {suggestions.map((item) => (
@@ -58,7 +62,10 @@ export default function SearchBar({ onSelect }) {
               <button
                 type="button"
                 className="w-full text-left"
-                onClick={() => handleSelect(item)}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSelect(item);
+                }}
               >
                 <strong>{item.word}</strong>
                 <span>{item.description}</span>

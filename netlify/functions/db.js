@@ -1,7 +1,3 @@
-import pkg from "pg";
-const { Pool } = pkg;
+import { neon } from "@neondatabase/serverless";
 
-export const db = new Pool({
-  connectionString: process.env.DATABASE_URL + "&sslmode=verify-full",
-  ssl: { rejectUnauthorized: false }
-});
+export const db = neon(process.env.DATABASE_URL);

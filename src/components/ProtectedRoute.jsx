@@ -1,25 +1,31 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { apiFetch } from "@/lib/api";
 
 export default function ProtectedRoute({ children }) {
-  const [status, setStatus] = useState("checking"); // "checking" | "ok" | "invalid"
+  const [status, setStatus] = useState("checking");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) { setStatus("invalid"); return; }
 
-    apiFetch("/auth/verify", {
+    fetch("/.netlify/functions/verify", {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(() => setStatus("ok"))
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) setStatus("ok");
+        else {
+          localStorage.removeItem("token");
+          setStatus("invalid");
+        }
+      })
       .catch(() => {
-        localStorage.removeItem("token"); // clear bad token
+        localStorage.removeItem("token");
         setStatus("invalid");
       });
   }, []);
 
-  if (status === "checking") return null; // or a spinner
+  if (status === "checking") return null;
   if (status === "invalid") return <Navigate to="/" replace />;
   return children;
 }

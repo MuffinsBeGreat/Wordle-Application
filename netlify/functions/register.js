@@ -49,10 +49,7 @@ export async function handler(event) {
     try {
         const hash = await bcrypt.hash(password, 10);
 
-        await db.query(
-            "INSERT INTO users (username, password_hash, role) VALUES ($1, $2, $3)",
-            [username, hash, 2]
-        );
+        await db`INSERT INTO users (username, password_hash, role) VALUES (${username}, ${hash}, ${2})`;
 
         const token = jwt.sign({ username, role: 2 }, process.env.JWT_SECRET, {
             expiresIn: "7d"

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:netlify": "taskkill /F /IM node.exe & timeout /t 2 & netlify dev",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -14,13 +15,10 @@
     "@emotion/styled": "^11.14.1",
     "@fontsource-variable/geist": "^5.2.9",
     "@mui/material": "^9.0.1",
-    "bcryptjs": "^3.0.3",
+    "@neondatabase/serverless": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.16.0",
-    "mysql2": "^3.22.3",
-    "pg": "^8.21.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -35,10 +33,14 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "bcryptjs": "^3.0.3",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.22.5",
+    "pg": "^8.21.0",
     "tailwindcss": "^4.3.0",
     "vite": "^8.0.12"
   }

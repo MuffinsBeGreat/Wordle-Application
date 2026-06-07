@@ -23,7 +23,13 @@ export async function apiFetch(endpoint, options = {}) {
     return;
   }
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "API request failed");
+  let data = {};
+  try {
+    data = await res.json();
+  } catch {
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    return {};
+  }
+  if (!res.ok) throw new Error(data.error || data.message || "API request failed");
   return data;
 }

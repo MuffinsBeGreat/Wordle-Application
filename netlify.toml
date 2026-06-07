@@ -2,6 +2,15 @@
   functions = "netlify/functions"
   command = "npm run build"
 
+[dev]
+  command = "npm run dev"
+  port = 8888
+  targetPort = 5173
+  framework = "#custom"
+
+[functions]
+  node_bundler = "esbuild"
+
 # Specific API routes first
 [[redirects]]
   from = "/api/auth/verify"
@@ -39,13 +48,14 @@
   status = 200
   force = true
 
-# Wildcard fallback for any other /api/* routes 
+# Wildcard fallback for any other /api/* routes
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+  force = true
 
-# SPA fallback
+# SPA fallback — must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"

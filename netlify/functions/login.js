@@ -1,6 +1,6 @@
 import { db } from "./db.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
 
 export async function handler(event) {
   if (event.httpMethod === "OPTIONS") {
@@ -16,26 +16,31 @@ export async function handler(event) {
 
   const { username, password } = JSON.parse(event.body || "{}");
 
-  try {
-    const result = await db.query(
-      "SELECT * FROM users WHERE username = $1",
-      [username]
-    );
+  if (!username || !password) {
+    return {
+      statusCode: 400,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ status: "error", message: "Missing fields" })
+    };
+  }
 
-    const user = result.rows[0];
+  try {
+    const result = await db`SELECT * FROM users WHERE username = ${username}`;
+    const user = result[0];
 
     if (!user) {
       return {
         statusCode: 401,
+        headers: { "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ status: "error", message: "Invalid credentials" })
       };
     }
 
     const valid = await bcrypt.compare(password, user.password_hash);
-
     if (!valid) {
       return {
         statusCode: 401,
+        headers: { "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ status: "error", message: "Invalid credentials" })
       };
     }
@@ -48,16 +53,18 @@ export async function handler(event) {
 
     return {
       statusCode: 200,
+      headers: { "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({
         status: "success",
         token,
-        user: { username }
+        user: { username: user.username, role: user.role }
       })
     };
-
   } catch (err) {
+    console.error("LOGIN ERROR:", err);
     return {
       statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({ status: "error", message: "Server error" })
     };
   }

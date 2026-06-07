@@ -110,6 +110,7 @@ export default function Wordle6() {
         timeVariance={300}
         colors={[1, 2, 3, 1, 2, 3, 1, 4]}
       />
+      <br />
       <Card className="max-w-xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-2">5-Letter Wordle</h1>
 
