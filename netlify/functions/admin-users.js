@@ -12,4 +12,4 @@ export default async (req) => {
     }
 };
 
-export const config = { path: "/api/admin/users" };
+// export const config = { path: "/api/admin/users" };

@@ -25,4 +25,4 @@ export default async (req) => {
     }
 };
 
-export const config = { path: "/api/words/:word" };
+// export const config = { path: "/api/words/:word" };
