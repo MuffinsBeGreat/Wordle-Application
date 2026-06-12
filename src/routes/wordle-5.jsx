@@ -1,3 +1,4 @@
+// 5-letter wordle game - basically guess the word but make it hard
 import { Card } from "@/components/ui/card";
 import WordleInput from "@/components/WordleInput";
 import { useState, useEffect } from "react";
@@ -7,6 +8,7 @@ import GooeyNav from "@/components/GooeyNav";
 const WORD_LENGTH = 5; // 3, 4, 5, 6, or 7
 const MAX_GUESSES = WORD_LENGTH + 1;
 
+// compares your guess to the actual word and returns whether letters are correct, present, or wrong
 function scoreGuess(guess, secret) {
   const result = Array(secret.length).fill("absent");
   const used = Array(secret.length).fill(false);
@@ -32,6 +34,7 @@ function scoreGuess(guess, secret) {
   return result;
 }
 
+// checks if the word is actually a real word using the dictionary API
 const validateWord = async (word) => {
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
@@ -41,6 +44,7 @@ const validateWord = async (word) => {
   }
 };
 
+// main game component - handles all the game logic
 export default function Wordle5() { // rename to Wordle3, Wordle4, etc.
   const [secret, setSecret] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -89,6 +93,7 @@ export default function Wordle5() { // rename to Wordle3, Wordle4, etc.
 
   const won = guesses.some((g) => g.states.every((s) => s === "correct"));
 
+  // when user submits a word - validate it, score it, and check if they won
   const handleSubmit = async (word) => {
     if (gameOver || checking || !secret) return;
     setChecking(true);
@@ -112,6 +117,7 @@ export default function Wordle5() { // rename to Wordle3, Wordle4, etc.
     if (justWon || newGuesses.length >= MAX_GUESSES) setGameOver(true);
   };
 
+  // resets everything and loads a new word - basically start over
   const handleNewGame = () => {
     setGuesses([]);
     setCurrent(Array(WORD_LENGTH).fill(""));
