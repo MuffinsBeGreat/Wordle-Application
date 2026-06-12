@@ -37,7 +37,7 @@ const validateWord = async (word) => {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
     return res.ok;
   } catch {
-    return true;
+    return false;
   }
 };
 
@@ -112,11 +112,6 @@ export default function Wordle5() { // rename to Wordle3, Wordle4, etc.
     if (justWon || newGuesses.length >= MAX_GUESSES) setGameOver(true);
   };
 
-  const handleInvalid = () => {
-    setShake(true);
-    setTimeout(() => setShake(false), 600);
-  };
-
   const handleNewGame = () => {
     setGuesses([]);
     setCurrent(Array(WORD_LENGTH).fill(""));
@@ -140,7 +135,7 @@ export default function Wordle5() { // rename to Wordle3, Wordle4, etc.
       />
       <br />
       <Card className="max-w-xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-2">X-Letter Wordle</h1>
+        <h1 className="text-2xl font-bold mb-2">5-Letter Wordle</h1>
 
         {loading && (
           <p className="text-center text-muted-foreground py-8">Loading word...</p>
