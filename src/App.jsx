@@ -11,6 +11,7 @@ import Wordle5 from "@/routes/wordle-5";
 import Wordle6 from "@/routes/wordle-6";
 import Wordle7 from "@/routes/wordle-7";
 import Search from "@/routes/search";
+import ChangePassword from "@/routes/change-password";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
       {/* Public */}
       <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/change-password" element={<ChangePassword />} />
 
       {/* Protected */}
       <Route

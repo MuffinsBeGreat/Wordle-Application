@@ -24,6 +24,13 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.user.username);
       localStorage.setItem("role", data.user.role);
+
+      if (data.passwordChangedByAdmin) {
+        localStorage.setItem("forcePasswordChange", "true");
+        nav("/change-password");
+        return;
+      }
+
       nav("/dashboard");
     } else {
       setError(data.message || "Login failed");

@@ -19,6 +19,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/admin/users/:id/password"
+  to = "/.netlify/functions/admin-users-password"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/admin/users/:id/role"
   to = "/.netlify/functions/admin-users-role"
   status = 200

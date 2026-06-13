@@ -1,6 +1,7 @@
 import { db } from "./db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { validateUsername, validatePassword } from "./validation.js";
 
 export async function handler(event) {
   if (event.httpMethod === "OPTIONS") {
@@ -16,11 +17,32 @@ export async function handler(event) {
 
   const { username, password } = JSON.parse(event.body || "{}");
 
+  // validate inputs before processing
   if (!username || !password) {
     return {
       statusCode: 400,
       headers: { "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({ status: "error", message: "Missing fields" })
+    };
+  }
+
+  // validate username format
+  const usernameValidation = validateUsername(username);
+  if (!usernameValidation.valid) {
+    return {
+      statusCode: 400,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ status: "error", message: usernameValidation.message })
+    };
+  }
+
+  // validate password format
+  const passwordValidation = validatePassword(password);
+  if (!passwordValidation.valid) {
+    return {
+      statusCode: 400,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ status: "error", message: "Invalid password format" })
     };
   }
 
@@ -35,6 +57,8 @@ export async function handler(event) {
         body: JSON.stringify({ status: "error", message: "Invalid credentials" })
       };
     }
+
+    const passwordChangedByAdmin = !!user.password_changed_by_admin;
 
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
@@ -57,6 +81,7 @@ export async function handler(event) {
       body: JSON.stringify({
         status: "success",
         token,
+        passwordChangedByAdmin,
         user: { username: user.username, role: user.role }
       })
     };

@@ -132,6 +132,26 @@ export default function Search() {
         } catch (e) { setFeedback(e.message); }
     };
 
+    // changeUserPassword: prompts admin for a new password for a user, hashes it on server
+    // INPUT: userId (user id), username (for display)
+    // OUTPUT: asks for password via prompt, confirms, then sends to backend
+    const changeUserPassword = async (userId, userName) => {
+        const newPassword = prompt(`Enter new password for "${userName}":`);
+        if (!newPassword) return;
+        const confirmPassword = prompt("Confirm new password:");
+        if (newPassword !== confirmPassword) {
+            setFeedback("Passwords do not match.");
+            return;
+        }
+        try {
+            await apiFetch(`/admin/users/${userId}/password`, {
+                method: "PUT",
+                body: JSON.stringify({ newPassword }),
+            });
+            setFeedback(`Password changed for "${userName}".`);
+        } catch (e) { setFeedback(e.message); }
+    };
+
     // deleteUser: removes a user account from database with safety checks (can't delete yourself)
     // INPUT: userId (user id to delete), userToDeleteName (username for display)
     // OUTPUT: checks if current user, asks for confirmation, deletes from backend, updates userList
@@ -226,10 +246,10 @@ export default function Search() {
                     ) : (
                         <div className="space-y-3">
                             {/* Header row */}
-                            <div className="grid grid-cols-4 gap-2 pb-2 border-b border-border font-semibold text-sm">
+                            <div className="grid grid-cols-5 gap-2 pb-2 border-b border-border font-semibold text-sm">
                                 <div>Username</div>
                                 <div>Role</div>
-                                <div className="col-span-2">Actions</div>
+                                <div className="col-span-3">Actions</div>
                             </div>
                             
                             {/* User rows */}
@@ -237,10 +257,10 @@ export default function Search() {
                                 // prevent admin from modifying their own account
                                 const isCurrentUser = u.username === username;
                                 return (
-                                    <div key={u.user_id} className="grid grid-cols-4 gap-2 items-center text-sm">
+                                    <div key={u.user_id} className="grid grid-cols-5 gap-2 items-center text-sm">
                                         <div className="font-medium truncate">{u.username}</div>
                                         <div className="text-muted-foreground">{u.role === 1 ? "Admin" : "User"}</div>
-                                        <div className="col-span-2 flex gap-2">
+                                        <div className="col-span-3 flex gap-2">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
@@ -249,6 +269,15 @@ export default function Search() {
                                                 title={isCurrentUser ? "You cannot modify your own account" : ""}
                                             >
                                                 Make {u.role === 1 ? "User" : "Admin"}
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => changeUserPassword(u.user_id, u.username)}
+                                                disabled={isCurrentUser}
+                                                title={isCurrentUser ? "You cannot modify your own account" : ""}
+                                            >
+                                                Change Password
                                             </Button>
                                             <Button
                                                 variant="destructive"

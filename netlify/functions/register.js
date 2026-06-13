@@ -1,6 +1,7 @@
 import { db } from "./db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { validateUsername, validatePassword } from "./validation.js";
 
 export async function handler(event) {
     if (event.httpMethod === "OPTIONS") {
@@ -29,27 +30,31 @@ export async function handler(event) {
         };
     }
 
-    const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
-
-    if (!passwordRegex.test(password)) {
+    // validate username format
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.valid) {
         return {
             statusCode: 400,
-            headers: {
-                "Access-Control-Allow-Origin": "*"
-            },
-            body: JSON.stringify({
-                status: "error",
-                message:
-                    "Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character."
-            })
+            headers: { "Access-Control-Allow-Origin": "*" },
+            body: JSON.stringify({ status: "error", message: usernameValidation.message })
+        };
+    }
+
+    // validate password format
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+        return {
+            statusCode: 400,
+            headers: { "Access-Control-Allow-Origin": "*" },
+            body: JSON.stringify({ status: "error", message: passwordValidation.message })
         };
     }
 
     try {
         const hash = await bcrypt.hash(password, 10);
 
-        await db`INSERT INTO users (username, password_hash, role) VALUES (${username}, ${hash}, ${2})`;
+        // create new user with security fields initialized
+        await db`INSERT INTO users (username, password_hash, role, password_changed_by_admin) VALUES (${username}, ${hash}, ${2}, ${false})`;
 
         const token = jwt.sign({ username, role: 2 }, process.env.JWT_SECRET, {
             expiresIn: "7d"
